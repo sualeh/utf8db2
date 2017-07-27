@@ -1,15 +1,8 @@
 plugins {
   id 'java'
-	id 'eclipse'
-}
-
-repositories {
-  jcenter()
-		flatDir {
-    dirs 'libs'
-  }		
+  id 'eclipse'
 }
 
 dependencies {
-
+  compile files("libs/db2jcc4.jar")
 }
