@@ -2,6 +2,7 @@ package us.fatehi.utf8db2;
 
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -33,6 +34,13 @@ public class UTF8DB2
       try (final Statement statement = connection.createStatement();)
       {
         statement.execute("DROP TABLE TAB1");
+      }
+      catch (final Exception e)
+      {
+        System.err.println(e.getMessage());
+      }
+      try (final Statement statement = connection.createStatement();)
+      {
         statement.execute("CREATE TABLE TAB1 (COL1 VARCHAR(3))");
       }
       System.out.println("Test table dropped and re-created");
@@ -85,6 +93,7 @@ public class UTF8DB2
     {
       connectionProps.put("password", password);
     }
+    connectionProps.put("retrieveMessagesFromServerOnGetMessage", "true");
 
     if (handleBrokenUF8)
     {
@@ -93,7 +102,10 @@ public class UTF8DB2
 
     final Connection conn = DriverManager.getConnection(url, connectionProps);
 
-    System.out.println("Connected to database, " + conn.toString());
+    final DatabaseMetaData metaData = conn.getMetaData();
+    System.out.format("Connected to database, %s %s%n",
+                      metaData.getDatabaseProductName(),
+                      metaData.getDatabaseProductVersion());
     return conn;
   }
 
