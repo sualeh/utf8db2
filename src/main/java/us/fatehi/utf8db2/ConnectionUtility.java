@@ -71,6 +71,19 @@ public class ConnectionUtility
     }
   }
 
+  public static void insertString(final Connection connection,
+                                  final String insertTableSQL,
+                                  final String string)
+    throws SQLException
+  {
+    try (final PreparedStatement preparedStatement = connection
+      .prepareStatement(insertTableSQL);)
+    {
+      preparedStatement.setString(1, string);
+      preparedStatement.executeUpdate();
+    }
+  }
+
   private ConnectionUtility()
   {
     // Prevent instantiation
