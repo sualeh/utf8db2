@@ -58,26 +58,26 @@ public class ConnectionUtility
     return conn;
   }
 
-  public static void insertBytes(final Connection connection,
-                                 final String insertTableSQL,
-                                 final byte[] bytes)
+  public static void insert(final Connection connection,
+                            final String insertSQL,
+                            final byte[] bytes)
     throws SQLException
   {
     try (final PreparedStatement preparedStatement = connection
-      .prepareStatement(insertTableSQL);)
+      .prepareStatement(insertSQL);)
     {
       preparedStatement.setBytes(1, bytes);
       preparedStatement.executeUpdate();
     }
   }
 
-  public static void insertString(final Connection connection,
-                                  final String insertTableSQL,
-                                  final String string)
+  public static void insert(final Connection connection,
+                            final String insertSQL,
+                            final String string)
     throws SQLException
   {
     try (final PreparedStatement preparedStatement = connection
-      .prepareStatement(insertTableSQL);)
+      .prepareStatement(insertSQL);)
     {
       preparedStatement.setString(1, string);
       preparedStatement.executeUpdate();
