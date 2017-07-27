@@ -31,18 +31,8 @@ public class UTF8DB2
                                                      true))
     {
       // 1. Clear table for this test
-      try (final Statement statement = connection.createStatement();)
-      {
-        statement.execute("DROP TABLE TAB1");
-      }
-      catch (final Exception e)
-      {
-        System.err.println(e.getMessage());
-      }
-      try (final Statement statement = connection.createStatement();)
-      {
-        statement.execute("CREATE TABLE TAB1 (COL1 VARCHAR(3))");
-      }
+      execute(connection, "DROP TABLE TAB1");
+      execute(connection, "CREATE TABLE TAB1 (COL1 VARCHAR(3))");
       System.out.println("Test table dropped and re-created");
 
       // 2. Insert bad UTF-8 bytes
@@ -78,6 +68,18 @@ public class UTF8DB2
           System.out.println(results.getString(1));
         }
       }
+    }
+  }
+
+  private static void execute(final Connection connection, String sql)
+  {
+    try (final Statement statement = connection.createStatement();)
+    {
+      statement.execute(sql);
+    }
+    catch (final Exception e)
+    {
+      System.err.println(e.getMessage());
     }
   }
 
