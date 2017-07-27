@@ -45,7 +45,10 @@ public class UTF8DB2
       {
         while (results.next())
         {
-          System.out.println(results.getString(1));
+          System.out.format("%s row %d: %s%n",
+                            results.getMetaData().getColumnLabel(1),
+                            results.getRow(),
+                            results.getString(1));
         }
       }
     }
