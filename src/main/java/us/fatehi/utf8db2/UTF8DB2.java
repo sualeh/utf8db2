@@ -1,14 +1,12 @@
 package us.fatehi.utf8db2;
 
 
+import static us.fatehi.utf8db2.ConnectionUtility.execute;
+import static us.fatehi.utf8db2.ConnectionUtility.getConnection;
+import static us.fatehi.utf8db2.ConnectionUtility.insertBytes;
+
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Properties;
 
 public class UTF8DB2
 {
@@ -16,19 +14,7 @@ public class UTF8DB2
     throws Exception
   {
 
-    /*
-     * final String url = "jdbc:db2://192.168.56.101:50000/SAMPLE";
-     * final String username = "db2inst1"; final String password =
-     * "sualeh-db2-password";
-     */
-    final String url = "jdbc:db2://sfatehi-vm1:50000/bevap:securityMechanism=4;currentSchema=SFATEHI;";
-    final String username = "sfatehi";
-    final String password = null;
-
-    try (final Connection connection = getConnection(url,
-                                                     username,
-                                                     password,
-                                                     true))
+    try (final Connection connection = getConnection(true))
     {
       // 1. Clear table for this test
       execute(connection, "DROP TABLE TAB1");
@@ -36,26 +22,20 @@ public class UTF8DB2
       System.out.println("Test table dropped and re-created");
 
       // 2. Insert bad UTF-8 bytes
-      final String insertTableSQL = "INSERT INTO TAB1 (COL1) VALUES (?)";
-      try (final PreparedStatement preparedStatement = connection
-        .prepareStatement(insertTableSQL);)
-      {
-        preparedStatement.setBytes(1,
-                                   new byte[] {
-                                                (byte) 0xE2,
-                                                (byte) 0x82,
-                                                (byte) 0xAC
-                                   });
-        preparedStatement.executeUpdate();
-
-        preparedStatement.setBytes(1,
-                                   new byte[] {
-                                                (byte) 0xBF,
-                                                (byte) 0x20,
-                                                (byte) 0x52
-                                   });
-        preparedStatement.executeUpdate();
-      }
+      insertBytes(connection,
+                  "INSERT INTO TAB1 (COL1) VALUES (?)",
+                  new byte[] {
+                               (byte) 0xE2,
+                               (byte) 0x82,
+                               (byte) 0xAC
+                  });
+      insertBytes(connection,
+                  "INSERT INTO TAB1 (COL1) VALUES (?)",
+                  new byte[] {
+                               (byte) 0xBF,
+                               (byte) 0x20,
+                               (byte) 0x52
+                  });
       System.out.println("Data inserted into table");
 
       // 3. Read them back out
@@ -69,46 +49,6 @@ public class UTF8DB2
         }
       }
     }
-  }
-
-  private static void execute(final Connection connection, String sql)
-  {
-    try (final Statement statement = connection.createStatement();)
-    {
-      statement.execute(sql);
-    }
-    catch (final Exception e)
-    {
-      System.err.println(e.getMessage());
-    }
-  }
-
-  private static Connection getConnection(final String url,
-                                          final String username,
-                                          final String password,
-                                          final boolean handleBrokenUF8)
-    throws SQLException
-  {
-    final Properties connectionProps = new Properties();
-    connectionProps.put("user", username);
-    if (password != null)
-    {
-      connectionProps.put("password", password);
-    }
-    connectionProps.put("retrieveMessagesFromServerOnGetMessage", "true");
-
-    if (handleBrokenUF8)
-    {
-      System.setProperty("db2.jcc.charsetDecoderEncoder", "3");
-    }
-
-    final Connection conn = DriverManager.getConnection(url, connectionProps);
-
-    final DatabaseMetaData metaData = conn.getMetaData();
-    System.out.format("Connected to database, %s %s%n",
-                      metaData.getDatabaseProductName(),
-                      metaData.getDatabaseProductVersion());
-    return conn;
   }
 
 }
