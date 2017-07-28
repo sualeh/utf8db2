@@ -24,7 +24,7 @@ public class ConnectionUtility
     }
   }
 
-  public static Connection getConnection(final boolean handleBrokenUF8)
+  public static Connection getConnection()
     throws SQLException
   {
     /*
@@ -43,11 +43,6 @@ public class ConnectionUtility
       connectionProps.put("password", password);
     }
     connectionProps.put("retrieveMessagesFromServerOnGetMessage", "true");
-
-    if (handleBrokenUF8)
-    {
-      System.setProperty("db2.jcc.charsetDecoderEncoder", "3");
-    }
 
     final Connection conn = DriverManager.getConnection(url, connectionProps);
 
