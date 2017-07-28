@@ -27,16 +27,17 @@ public class UTF8DB2
       System.out.println("Test table dropped and re-created");
 
       // 2. Insert good and bad UTF-8 bytes
-      execute(connection, "INSERT INTO TAB1 VALUES ('Ã')");
+      final String insertSQL = "INSERT INTO TAB1 (COL1) VALUES (?)";
+      insert(connection, insertSQL, "Ã");
       insert(connection,
-             "INSERT INTO TAB1 (COL1) VALUES (?)",
+             insertSQL,
              new byte[] {
                           (byte) 0xE2,
                           (byte) 0x82,
                           (byte) 0xAC
              });
       insert(connection,
-             "INSERT INTO TAB1 (COL1) VALUES (?)",
+             insertSQL,
              new byte[] {
                           (byte) 0xBF,
                           (byte) 0x20,
@@ -45,9 +46,9 @@ public class UTF8DB2
       System.out.println("Data inserted into table");
 
       // 3. Read them back out
-      // http://www-01.ibm.com/support/docview.wss?uid=swg21684365
+      final String selectSQL = "SELECT HEX(COL1), COL1 FROM TAB1";
       try (final ResultSet results = connection.createStatement()
-        .executeQuery("SELECT HEX(COL1), COL1 FROM TAB1");)
+        .executeQuery(selectSQL);)
       {
         while (results.next())
         {
